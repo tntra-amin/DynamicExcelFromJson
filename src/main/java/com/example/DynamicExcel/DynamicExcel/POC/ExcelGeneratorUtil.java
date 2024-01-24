@@ -60,7 +60,7 @@ public class ExcelGeneratorUtil {
 
                 cell = row.createCell(header.getValue());
 
-                String headerName = Arrays.stream(header.getKey().split("_")).reduce("",(str1, str2) -> str1 + " " + str2).toUpperCase();
+                String headerName = Arrays.stream(header.getKey().split("_")).reduce("", (str1, str2) -> str1 + " " + str2).toUpperCase();
 
                 cell.setCellValue(headerName);
                 cell.setCellStyle(boldCellStyle);
@@ -79,13 +79,14 @@ public class ExcelGeneratorUtil {
                     if (excelColumns.containsKey(currentValue.getKey())) {
 
                         cell = row.createCell(excelColumns.get(currentValue.getKey()));
+
                         if (currentValue.getValue() instanceof Integer)
                             cell.setCellValue((Integer) currentValue.getValue());
-                        else if(currentValue.getValue() instanceof String)
+                        else if (currentValue.getValue() instanceof String)
                             cell.setCellValue((String) currentValue.getValue());
-                        else if(currentValue.getValue() instanceof Long)
+                        else if (currentValue.getValue() instanceof Long)
                             cell.setCellValue((Long) currentValue.getValue());
-                        else if(currentValue.getValue() instanceof Boolean)
+                        else if (currentValue.getValue() instanceof Boolean)
                             cell.setCellValue((Boolean) currentValue.getValue());
                         else
                             cell.setCellValue((String) currentValue.getValue());
@@ -97,7 +98,6 @@ public class ExcelGeneratorUtil {
                 rowIndex++;
 
             }
-            ;
 
             FileOutputStream out = new FileOutputStream(new File("SAMPLE_TEST.xlsx"));
             workbook.write(out);
