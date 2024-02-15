@@ -3,43 +3,42 @@ package com.example.DynamicExcel.DynamicExcel.POC;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class JsonFlattenUtil {
 
-    public static Map<String, Object> flattenUtil(Object input, Set<String> allValidColumns) {
-        Map<String, Object> flattenedMap = new HashMap<>();
+    public static Map<String, Object> flattenUtil(Object input) {
+        Map<String, Object> flattenedMap = new LinkedHashMap<>();
         String parentKey = "";
-        flattenObjectOrArray(input, flattenedMap, parentKey, allValidColumns);
+        flattenObjectOrArray(input, flattenedMap, parentKey);
         return flattenedMap;
     }
 
-    private static void flattenObjectOrArray(Object input, Map<String, Object> flattenedMap, String parentKey, Set<String> allValidColumns) {
+    private static void flattenObjectOrArray(Object input, Map<String, Object> flattenedMap, String parentKey) {
         if (input instanceof JSONObject) {
-            flattenObject((JSONObject) input, flattenedMap, parentKey, allValidColumns);
+            flattenObject((JSONObject) input, flattenedMap, parentKey);
         } else if (input instanceof JSONArray) {
-            flattenArray((JSONArray) input, flattenedMap, parentKey, allValidColumns);
+            flattenArray((JSONArray) input, flattenedMap, parentKey);
         } else {
-            allValidColumns.add(parentKey);
             flattenedMap.put(parentKey, input);
         }
     }
 
-    private static void flattenObject(JSONObject inputObject, Map<String, Object> flattenedMap, String parentKey, Set<String> allValidColumns) {
+    private static void flattenObject(JSONObject inputObject, Map<String, Object> flattenedMap, String parentKey) {
         for (Object key : inputObject.keySet()) {
             String newKey = parentKey.isEmpty() ? (String) key : parentKey + "_" + key;
             Object value = inputObject.get(key);
-            flattenObjectOrArray(value, flattenedMap, newKey, allValidColumns);
+            flattenObjectOrArray(value, flattenedMap, newKey);
         }
     }
 
-    private static void flattenArray(JSONArray inputArray, Map<String, Object> flattenedMap, String parentKey, Set<String> allValidColumns) {
-        inputArray.forEach(inputObj -> {
-            String newKey = parentKey.isEmpty() ? "" : parentKey;
-            flattenObjectOrArray(inputObj, flattenedMap, newKey, allValidColumns);
-        });
+    private static void flattenArray(JSONArray inputArray, Map<String, Object> flattenedMap, String parentKey) {
+        for (int i = 0; i < inputArray.size(); i++) {
+            Object inputObj = inputArray.get(i);
+            String newKey = parentKey.isEmpty() ? "" : parentKey + "_" + (i+1);
+            flattenObjectOrArray(inputObj, flattenedMap, newKey);
+        }
     }
 
 }

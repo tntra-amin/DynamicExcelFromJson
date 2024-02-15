@@ -17,7 +17,26 @@
       "gender": "Female",
       "mobile": null
     },
-    "manualStatus": [],
+    "manualStatus": [
+      {
+        "id": 1,
+        "reason": "Reason 1",
+        "status": "Rejected",
+        "role": ["bu_head","emp_head","transaction_head"],
+        "action_date": 1699381800000,
+        "hr_action_date": null,
+        "action_by_id": 237
+      },
+      {
+        "id": 2,
+        "reason": "Reason 2",
+        "status": "Approved",
+        "role": ["bu_head"],
+        "action_date": 1699381800000,
+        "hr_action_date": null,
+        "action_by_id": 237
+      }
+    ],
     "_active": true
   },
   {
@@ -43,69 +62,25 @@
         "id": 1,
         "reason": "Reason 1",
         "status": "Rejected",
-        "role": "bu_head",
+        "role": ["bu_head"],
         "action_date": 1699381800000,
         "hr_action_date": null,
         "action_by_id": 237
-      }
-    ],
-    "_active": true
-  },
-  {
-    "id": 2,
-    "created_at": "2023-11-06 10:57:49.652316+05:30",
-    "in_date": "2023-11-02",
-    "out_date": "2023-11-02",
-    "in_time": 16200000,
-    "out_time": 5520000,
-    "in_type": "manual",
-    "out_type": "manual",
-    "is_manual": "t",
-    "employee": {
-      "employeejobdetails_ptr_id": 237,
-      "first_name": "Bansari",
-      "middle_name": "B",
-      "last_name": "Pawar",
-      "gender": "Female",
-      "mobile": null
-    },
-    "manualStatus": [
+      },
       {
         "id": 2,
         "reason": "Reason 2",
-        "status": "Approved",
-        "role": "bu_head",
+        "status": "Rejected",
+        "role": ["bu_head","trans_head"],
         "action_date": 1699381800000,
-        "hr_action_date": 1700073000000,
+        "hr_action_date": null,
         "action_by_id": 237
-      }
-    ],
-    "_active": true
-  },
-  {
-    "id": 3,
-    "created_at": "2023-11-06 11:06:57.552232+05:30",
-    "in_date": "2023-11-03",
-    "out_date": "2023-11-03",
-    "in_time": 23400000,
-    "out_time": 52200000,
-    "in_type": "manual",
-    "out_type": "manual",
-    "is_manual": "t",
-    "employee": {
-      "employeejobdetails_ptr_id": 178,
-      "first_name": "Emp",
-      "middle_name": "Emp",
-      "last_name": "Emp",
-      "gender": "Male",
-      "mobile": null
-    },
-    "manualStatus": [
+      },
       {
         "id": 3,
-        "reason": "Reason 1",
+        "reason": "Reason 3",
         "status": "Rejected",
-        "role": "bu_head",
+        "role": ["bu_head"],
         "action_date": 1699381800000,
         "hr_action_date": null,
         "action_by_id": 237

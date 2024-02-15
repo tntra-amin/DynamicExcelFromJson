@@ -17,7 +17,26 @@
       "gender": "Female",
       "mobile": null
     },
-    "manualStatus": [],
+    "manualStatus": [
+      {
+        "id": 1,
+        "reason": "Reason 1",
+        "status": "Rejected",
+        "role": "bu_head",
+        "action_date": 1699381800000,
+        "hr_action_date": null,
+        "action_by_id": 237
+      },
+      {
+        "id": 2,
+        "reason": "Reason 2",
+        "status": "Approved",
+        "role": "bu_head",
+        "action_date": 1699381800000,
+        "hr_action_date": null,
+        "action_by_id": 237
+      }
+    ],
     "_active": true
   },
   {
@@ -43,6 +62,24 @@
         "id": 1,
         "reason": "Reason 1",
         "status": "Rejected",
+        "role": "bu_head",
+        "action_date": 1699381800000,
+        "hr_action_date": null,
+        "action_by_id": 237
+      },
+      {
+        "id": 2,
+        "reason": "Reason 20",
+        "status": "Approved",
+        "role": "bu_head",
+        "action_date": 1699381800000,
+        "hr_action_date": null,
+        "action_by_id": 237
+      },
+      {
+        "id": 2,
+        "reason": "Reason 3",
+        "status": "Approved",
         "role": "bu_head",
         "action_date": 1699381800000,
         "hr_action_date": null,

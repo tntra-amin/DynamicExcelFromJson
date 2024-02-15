@@ -7,33 +7,49 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class ExcelGeneratorUtil {
 
-    public static void generateMapAndSet(List<Map<String, Object>> values, Set<String> allValidColumns, Object jsonObject) {
+    public static void generateMapAndSet(List<Map<String, Object>> values, Object jsonObject) {
 
         if (jsonObject instanceof JSONArray) {
 
             ((JSONArray) jsonObject).forEach(jsonObj -> {
 
-                values.add(JsonFlattenUtil.flattenUtil(jsonObj, allValidColumns));
+                values.add(JsonFlattenUtil.flattenUtil(jsonObj));
 
             });
 
         } else if (jsonObject instanceof JSONObject) {
 
-            values.add(JsonFlattenUtil.flattenUtil(jsonObject, allValidColumns));
+            values.add(JsonFlattenUtil.flattenUtil(jsonObject));
 
         }
 
     }
 
-    public static void generateExcel(Map<String, Integer> excelColumns, List<Map<String, Object>> values) {
+    public static List<Map<String, Object>> indexTheMapUtil(List<Map<String, Object>> values){
+        List<Map<String, Object>> modifiedList = new ArrayList<>();
+
+        for (int i = 0; i < values.size(); i++) {
+            Map<String, Object> originalMap = values.get(i);
+            Map<String, Object> modifiedMap = new HashMap<>();
+
+            int index = 0;
+            for (Map.Entry<String, Object> entry : originalMap.entrySet()) {
+                String indexedKey = index++ + ":" + entry.getKey();
+                modifiedMap.put(indexedKey, entry.getValue());
+            }
+
+            modifiedList.add(modifiedMap);
+        }
+
+        return modifiedList;
+    }
+
+    public static void generateExcel(List<Map<String, Object>> values) {
 
         try {
 
@@ -52,23 +68,9 @@ public class ExcelGeneratorUtil {
 
             sheet = workbook.createSheet("TRIAL SHEET");
 
-            int rowIndex = 0;
-            row = sheet.createRow(rowIndex);
+            XSSFRow headerRow = sheet.createRow(0);
 
-            //Setting values for headers
-            for (Map.Entry<String, Integer> header : excelColumns.entrySet()) {
-
-                cell = row.createCell(header.getValue());
-
-                String headerName = Arrays.stream(header.getKey().split("_")).reduce("", (str1, str2) -> str1 + " " + str2).toUpperCase();
-
-                cell.setCellValue(headerName);
-                cell.setCellStyle(boldCellStyle);
-                sheet.autoSizeColumn(header.getValue());
-            }
-
-            rowIndex++;
-
+            int rowIndex = 1;
 
             for (Map<String, Object> valueMap : values) {
 
@@ -76,22 +78,30 @@ public class ExcelGeneratorUtil {
 
                 for (Map.Entry<String, Object> currentValue : valueMap.entrySet()) {
 
-                    if (excelColumns.containsKey(currentValue.getKey())) {
+                    String key = Arrays.stream(currentValue.getKey().split(":")[1].split("_")).reduce("", (str1, str2) -> str1 + " " + str2).toUpperCase();
 
-                        cell = row.createCell(excelColumns.get(currentValue.getKey()));
+                    int columnIndex = getColumnIndexUtil(headerRow,key)==-1 ? Integer.parseInt(currentValue.getKey().split(":")[0]) : getColumnIndexUtil(headerRow,key);
 
-                        if (currentValue.getValue() instanceof Integer)
-                            cell.setCellValue((Integer) currentValue.getValue());
-                        else if (currentValue.getValue() instanceof String)
-                            cell.setCellValue((String) currentValue.getValue());
-                        else if (currentValue.getValue() instanceof Long)
-                            cell.setCellValue((Long) currentValue.getValue());
-                        else if (currentValue.getValue() instanceof Boolean)
-                            cell.setCellValue((Boolean) currentValue.getValue());
-                        else
-                            cell.setCellValue((String) currentValue.getValue());
-
+                    if(headerRow.getCell(columnIndex) == null){
+                        headerRow.createCell(columnIndex).setCellValue(key);
                     }
+                    if(!headerRow.getCell(columnIndex).getStringCellValue().equals(key)){
+                        continue;
+                    }
+
+                    cell = row.createCell(columnIndex);
+                    sheet.autoSizeColumn(columnIndex);
+
+                    if (currentValue.getValue() instanceof Integer)
+                        cell.setCellValue((Integer) currentValue.getValue());
+                    else if (currentValue.getValue() instanceof String)
+                        cell.setCellValue((String) currentValue.getValue());
+                    else if (currentValue.getValue() instanceof Long)
+                        cell.setCellValue((Long) currentValue.getValue());
+                    else if (currentValue.getValue() instanceof Boolean)
+                        cell.setCellValue((Boolean) currentValue.getValue());
+                    else
+                        cell.setCellValue((String) currentValue.getValue());
 
                 }
 
@@ -109,4 +119,11 @@ public class ExcelGeneratorUtil {
         }
     }
 
+    public static int getColumnIndexUtil(XSSFRow headerRow,String key){
+        for(int i=0;i<headerRow.getPhysicalNumberOfCells();i++){
+            if(headerRow.getCell(i) != null && headerRow.getCell(i).getStringCellValue().equals(key))
+                return i;
+        }
+        return -1;
+    }
 }
