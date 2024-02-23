@@ -20,8 +20,6 @@ public class DynamicExcelService {
 
         ExcelGeneratorUtil.generateMapAndSet(values, jsonObject);
 
-        values = ExcelGeneratorUtil.indexTheMapUtil(values);
-
         ExcelGeneratorUtil.generateExcel(values);
 
     }

@@ -12,41 +12,40 @@ import java.util.*;
 @RestController
 public class ExcelGeneratorUtil {
 
+    public static int maxLength = Integer.MIN_VALUE;
+    public static Map<String,Object> headers;
+    public static Map<String,Integer> headersIndexMap = new HashMap<>();
+
     public static void generateMapAndSet(List<Map<String, Object>> values, Object jsonObject) {
 
         if (jsonObject instanceof JSONArray) {
 
             ((JSONArray) jsonObject).forEach(jsonObj -> {
 
-                values.add(JsonFlattenUtil.flattenUtil(jsonObj));
+                Map<String,Object> current = JsonFlattenUtil.flattenUtil(jsonObj);
+
+                if(current.size() > maxLength){
+                    maxLength = current.size();
+                    headers = current;
+                }
+
+                values.add(current);
 
             });
 
         } else if (jsonObject instanceof JSONObject) {
 
-            values.add(JsonFlattenUtil.flattenUtil(jsonObject));
+            Map<String,Object> current = JsonFlattenUtil.flattenUtil(jsonObject);
 
-        }
-
-    }
-
-    public static List<Map<String, Object>> indexTheMapUtil(List<Map<String, Object>> values){
-        List<Map<String, Object>> modifiedList = new ArrayList<>();
-
-        for (int i = 0; i < values.size(); i++) {
-            Map<String, Object> originalMap = values.get(i);
-            Map<String, Object> modifiedMap = new HashMap<>();
-
-            int index = 0;
-            for (Map.Entry<String, Object> entry : originalMap.entrySet()) {
-                String indexedKey = index++ + ":" + entry.getKey();
-                modifiedMap.put(indexedKey, entry.getValue());
+            if(current.size() > maxLength){
+                maxLength = current.size();
+                headers = current;
             }
 
-            modifiedList.add(modifiedMap);
+            values.add(current);
+
         }
 
-        return modifiedList;
     }
 
     public static void generateExcel(List<Map<String, Object>> values) {
@@ -70,6 +69,16 @@ public class ExcelGeneratorUtil {
 
             XSSFRow headerRow = sheet.createRow(0);
 
+            int colIndex = 0;
+
+            for(String col : headers.keySet()){
+                String key = Arrays.stream(col.split("_")).reduce("", (str1, str2) -> str1 + " " + str2).toUpperCase();
+                cell = headerRow.createCell(colIndex);
+                headersIndexMap.put(key,colIndex);
+                cell.setCellValue(key);
+                colIndex++;
+            }
+
             int rowIndex = 1;
 
             for (Map<String, Object> valueMap : values) {
@@ -78,16 +87,9 @@ public class ExcelGeneratorUtil {
 
                 for (Map.Entry<String, Object> currentValue : valueMap.entrySet()) {
 
-                    String key = Arrays.stream(currentValue.getKey().split(":")[1].split("_")).reduce("", (str1, str2) -> str1 + " " + str2).toUpperCase();
+                    String key = Arrays.stream(currentValue.getKey().split("_")).reduce("", (str1, str2) -> str1 + " " + str2).toUpperCase();
 
-                    int columnIndex = getColumnIndexUtil(headerRow,key)==-1 ? Integer.parseInt(currentValue.getKey().split(":")[0]) : getColumnIndexUtil(headerRow,key);
-
-                    if(headerRow.getCell(columnIndex) == null){
-                        headerRow.createCell(columnIndex).setCellValue(key);
-                    }
-                    if(!headerRow.getCell(columnIndex).getStringCellValue().equals(key)){
-                        continue;
-                    }
+                    int columnIndex = headersIndexMap.get(key);
 
                     cell = row.createCell(columnIndex);
                     sheet.autoSizeColumn(columnIndex);
@@ -119,11 +121,4 @@ public class ExcelGeneratorUtil {
         }
     }
 
-    public static int getColumnIndexUtil(XSSFRow headerRow,String key){
-        for(int i=0;i<headerRow.getPhysicalNumberOfCells();i++){
-            if(headerRow.getCell(i) != null && headerRow.getCell(i).getStringCellValue().equals(key))
-                return i;
-        }
-        return -1;
-    }
 }
